@@ -36,6 +36,11 @@ def create_pattern(user, **params):
     return pattern
 
 
+def create_user(**params):
+    """Create a return a new User"""
+    return get_user_model().objects.create_user(**params)
+
+
 class PublicPatternAPITests(TestCase):
     """Test - Unauthenticated API requests"""
 
@@ -54,9 +59,9 @@ class PrivatePatternApiTests(TestCase):
 
     def setUp(self):
         self.client = APIClient()
-        self.user = get_user_model().objects.create_user(
-            'user@example.com',
-            'testpass123',
+        self.user = create_user(
+            email='user@example.com',
+            password='testpass123',
         )
         self.client.force_authenticate(self.user)
 
@@ -95,4 +100,22 @@ class PrivatePatternApiTests(TestCase):
 
         for key, value in payload.items():
             self.assertEqual(getattr(pattern, key), value)
+        self.assertEqual(pattern.user, self.user)
+
+    def test_partial_update(self):
+        """Test - Partially update a Pattern"""
+        original_link = 'https://example.com/pattern.pdf'
+        pattern = create_pattern(
+            user=self.user,
+            title='Sample pattern title',
+            link=original_link,
+        )
+
+        payload = {'title': 'New pattern title'}
+        url = detail_url(pattern.id)
+        res = self.client.patch(url, payload)
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        pattern.refresh_from_db()
+        self.assertEqual(pattern.title, payload['title'])
         self.assertEqual(pattern.user, self.user)
