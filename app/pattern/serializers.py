@@ -13,3 +13,10 @@ class PatternSerializer(serializers.ModelSerializer):
         model = Pattern
         fields = ['id', 'title', 'link']
         read_only_fields = ['id']
+
+
+class PatternDetailSerializer(PatternSerializer):
+    """Serializer for the pattern detail view"""
+
+    class Meta(PatternSerializer.Meta):
+        fields = PatternSerializer.Meta.fields + ['description']

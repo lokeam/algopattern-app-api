@@ -10,10 +10,18 @@ from rest_framework.test import APIClient
 
 from core.models import Pattern
 
-from pattern.serializers import PatternSerializer
+from pattern.serializers import (
+    PatternSerializer,
+    PatternDetailSerializer,
+)
 
 
 PATTERN_URL = reverse('pattern:pattern-list')
+
+
+def detail_url(pattern_id):
+    """Create and return a pattern detail URL"""
+    return reverse('pattern:pattern-detail', args=[pattern_id])
 
 
 def create_pattern(user, **params):
@@ -53,7 +61,7 @@ class PrivatePatternApiTests(TestCase):
         self.client.force_authenticate(self.user)
 
     def test_retrieve_recipes(self):
-        """Test retrieving a list of recipes."""
+        """Test - Render a list of algo patterns specific to User Account"""
         create_pattern(user=self.user)
         create_pattern(user=self.user)
 
@@ -62,4 +70,14 @@ class PrivatePatternApiTests(TestCase):
         patterns = Pattern.objects.all().order_by('-id')
         serializer = PatternSerializer(patterns, many=True)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(res.data, serializer.data)
+
+    def test_get_pattern_detail(self):
+        """Test - Get Specific Details of an Algo Pattern"""
+        pattern = create_pattern(user=self.user)
+
+        url = detail_url(pattern.id)
+        res = self.client.get(url)
+
+        serializer = PatternDetailSerializer(pattern)
         self.assertEqual(res.data, serializer.data)
