@@ -26,3 +26,8 @@ class PatternViewSet(viewsets.ModelViewSet):
             return serializers.PatternDetailSerializer
 
         return self.serializer_class
+
+    def perform_create(self, serializer):
+        """When we perform a creation of a new obj via this viewset,
+        create a new algo pattern"""
+        serializer.save(user=self.request.user)

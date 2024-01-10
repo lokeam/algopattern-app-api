@@ -81,3 +81,18 @@ class PrivatePatternApiTests(TestCase):
 
         serializer = PatternDetailSerializer(pattern)
         self.assertEqual(res.data, serializer.data)
+
+    def test_create_pattern(self):
+        """Test - Create a Algo Pattern via API"""
+        payload = {
+            'title': 'Sample algo pattern',
+            'link': 'http://example.com/sliding-window.pdf'
+        }
+        res = self.client.post(PATTERN_URL, payload)
+
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        pattern = Pattern.objects.get(id=res.data['id'])
+
+        for key, value in payload.items():
+            self.assertEqual(getattr(pattern, key), value)
+        self.assertEqual(pattern.user, self.user)
