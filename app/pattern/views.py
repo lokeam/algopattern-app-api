@@ -39,7 +39,9 @@ class PatternViewSet(viewsets.ModelViewSet):
         serializer.save(user=self.request.user)
 
 
-class TagViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+class TagViewSet(mixins.UpdateModelMixin,
+                 mixins.ListModelMixin,
+                 viewsets.GenericViewSet):
     """Manage Tags within database"""
     serializer_class = serializers.TagSerializer
     queryset = Tag.objects.all()
