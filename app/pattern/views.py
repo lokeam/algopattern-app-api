@@ -1,11 +1,17 @@
 """
 Views for the Pattern APIs
 """
-from rest_framework import viewsets
+from rest_framework import (
+    viewsets,
+    mixins
+)
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 
-from core.models import Pattern
+from core.models import (
+    Pattern,
+    Tag
+)
 from pattern import serializers
 
 
@@ -31,3 +37,15 @@ class PatternViewSet(viewsets.ModelViewSet):
         """When we perform a creation of a new obj via this viewset,
         create a new algo pattern"""
         serializer.save(user=self.request.user)
+
+
+class TagViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+    """Manage Tags within database"""
+    serializer_class = serializers.TagSerializer
+    queryset = Tag.objects.all()
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        """Override get_queryset method to filter down to created user"""
+        return self.queryset.filter(user=self.request.user).order_by('-name')

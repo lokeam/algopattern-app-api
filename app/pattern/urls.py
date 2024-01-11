@@ -13,6 +13,7 @@ from pattern import views
 
 router = DefaultRouter()
 router.register('patterns', views.PatternViewSet)
+router.register('tags', views.TagViewSet)
 
 app_name = 'pattern'
 
