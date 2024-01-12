@@ -55,7 +55,9 @@ class TagViewSet(mixins.DestroyModelMixin,
         return self.queryset.filter(user=self.request.user).order_by('-name')
 
 
-class DatastructureViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+class DatastructureViewSet(mixins.ListModelMixin,
+                           mixins.UpdateModelMixin,
+                           viewsets.GenericViewSet):
     """Manage Datastructures in the database"""
     serializer_class = serializers.DatastructureSerializer
     queryset = Datastructure.objects.all()

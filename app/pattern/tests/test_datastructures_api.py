@@ -16,6 +16,11 @@ from pattern.serializers import DatastructureSerializer
 DS_URL = reverse('pattern:datastructure-list')
 
 
+def detail_url(datastructure_id):
+    """Create and return a datastructure detail URL"""
+    return reverse('pattern:datastructure-detail', args=[datastructure_id])
+
+
 def create_user(email='user@example.com', password='testpass123'):
     """Create and return user."""
     return get_user_model().objects.create_user(email=email, password=password)
@@ -68,3 +73,16 @@ class PrivateIngredientsApiTests(TestCase):
         self.assertEqual(len(res.data), 1)
         self.assertEqual(res.data[0]['name'], datastructure.name)
         self.assertEqual(res.data[0]['id'], datastructure.id)
+
+
+    def test_update_datastructure(self):
+        """Test - Update a Datastructure"""
+        datastructure = Datastructure.objects.create(user=self.user, name='HashMap')
+
+        payload = {'name': 'Trie'}
+        url = detail_url(datastructure.id)
+        res = self.client.patch(url, payload)
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        datastructure.refresh_from_db()
+        self.assertEqual(datastructure.name, payload['name'])
