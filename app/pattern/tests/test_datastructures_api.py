@@ -74,10 +74,10 @@ class PrivateIngredientsApiTests(TestCase):
         self.assertEqual(res.data[0]['name'], datastructure.name)
         self.assertEqual(res.data[0]['id'], datastructure.id)
 
-
     def test_update_datastructure(self):
         """Test - Update a Datastructure"""
-        datastructure = Datastructure.objects.create(user=self.user, name='HashMap')
+        datastructure = Datastructure.objects.create(
+            user=self.user, name='HashMap')
 
         payload = {'name': 'Trie'}
         url = detail_url(datastructure.id)
@@ -89,7 +89,8 @@ class PrivateIngredientsApiTests(TestCase):
 
     def test_delete_datastructure(self):
         """Test - Deleting a Datastructure"""
-        datastructure = Datastructure.objects.create(user=self.user, name='LinkedList')
+        datastructure = Datastructure.objects.create(
+            user=self.user, name='LinkedList')
 
         url = detail_url(datastructure.id)
         res = self.client.delete(url)
