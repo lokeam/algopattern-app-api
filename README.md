@@ -13,7 +13,7 @@ Powered by Python, Django, Docker and PostreSQL.
 * Browsable Admin interface allowing users to both see all endpoints and make test requests
 * Python Django codebase served via Docker containers and tested within automated CI/CD Github Action workflow
 
-## Project Status & Roadmap - 60% Complete
+## Project Status & Roadmap - 70% Complete
 
 * [x] Django Swagger UI Implementation
 * [x] Schema API
@@ -21,7 +21,7 @@ Powered by Python, Django, Docker and PostreSQL.
 * [x] Authentication Token API
 * [x] Pattern API
 * [x] Tag API
-* [ ] Data Structures API
+* [x] Data Structures API
 * [ ] Pattern Description Image API
 * [ ] Health Check API - Test if API is online
 * [ ] Filter Patterns by Data Structures and associated Tags
