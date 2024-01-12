@@ -5,8 +5,18 @@ from rest_framework import serializers
 
 from core.models import (
     Pattern,
-    Tag
+    Tag,
+    Datastructure,
 )
+
+
+class DatastructureSerializer(serializers.ModelSerializer):
+    """Serializer for datastructures."""
+
+    class Meta:
+        model = Datastructure
+        fields = ['id', 'name']
+        read_only_fields = ['id']
 
 
 class TagSerializer(serializers.ModelSerializer):

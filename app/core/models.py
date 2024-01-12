@@ -71,7 +71,7 @@ class Tag(models.Model):
 class Datastructure(models.Model):
     """Datastructures related to Algo Patterns"""
     name = models.CharField(max_length=255)
-    user =models.ForeignKey(
+    user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE
     )

@@ -13,7 +13,8 @@ from pattern import views
 
 router = DefaultRouter()
 router.register('patterns', views.PatternViewSet)
-router.register('tags', views.TagViewSet)
+router.register('tags', views.TagViewSet),
+router.register('datastructures', views.DatastructureViewSet)
 
 app_name = 'pattern'
 
