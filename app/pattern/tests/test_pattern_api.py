@@ -252,3 +252,45 @@ class PrivatePatternApiTests(TestCase):
                 user=self.user,
             ).exists()
             self.assertTrue(exists)
+
+    def test_create_datastructure_on_update(self):
+        """Test - Ceating datastructure when updating a Pattern"""
+        pattern = create_pattern(user=self.user)
+
+        payload = {'datastructures': [{'name': 'Array'}]}
+        url = detail_url(pattern.id)
+        res = self.client.patch(url, payload, format='json')
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        new_datastructure = Datastructure.objects.get(
+            user=self.user, name='Array')
+        self.assertIn(new_datastructure, pattern.datastructures.all())
+
+    def test_update_pattern_assign_datastructure(self):
+        """Test - Assign existing datastructure during Pattern update"""
+        ds1 = Datastructure.objects.create(user=self.user, name='Array')
+        pattern = create_pattern(user=self.user)
+        pattern.datastructures.add(ds1)
+
+        ds2 = Datastructure.objects.create(user=self.user, name='HashMap')
+        payload = {'datastructures': [{'name': 'HashMap'}]}
+        url = detail_url(pattern.id)
+        res = self.client.patch(url, payload, format='json')
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertIn(ds2, pattern.datastructures.all())
+        self.assertNotIn(ds1, pattern.datastructures.all())
+
+    def test_clear_pattern_datastructures(self):
+        """Test - Wipe a pattern's listed datastructures"""
+        datastructure = Datastructure.objects.create(
+            user=self.user, name='LinkedList')
+        pattern = create_pattern(user=self.user)
+        pattern.datastructures.add(datastructure)
+
+        payload = {'datastructures': []}
+        url = detail_url(pattern.id)
+        res = self.client.patch(url, payload, format='json')
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(pattern.datastructures.count(), 0)

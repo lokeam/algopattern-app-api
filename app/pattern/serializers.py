@@ -71,9 +71,14 @@ class PatternSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         """Update Pattern"""
         tags = validated_data.pop('tags', None)
+        datastructures = validated_data.pop('datastructures', None)
         if tags is not None:
             instance.tags.clear()
-            self._get_or_create_tags(tags, instance)
+            self._get_or_create_tags(tags, instance)\
+
+        if datastructures is not None:
+            instance.datastructures.clear()
+            self._get_or_create_datastructures(datastructures, instance)
 
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
