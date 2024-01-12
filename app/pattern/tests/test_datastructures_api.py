@@ -86,3 +86,14 @@ class PrivateIngredientsApiTests(TestCase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         datastructure.refresh_from_db()
         self.assertEqual(datastructure.name, payload['name'])
+
+    def test_delete_datastructure(self):
+        """Test - Deleting a Datastructure"""
+        datastructure = Datastructure.objects.create(user=self.user, name='LinkedList')
+
+        url = detail_url(datastructure.id)
+        res = self.client.delete(url)
+
+        self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
+        datastructures = Datastructure.objects.filter(user=self.user)
+        self.assertFalse(datastructures.exists())

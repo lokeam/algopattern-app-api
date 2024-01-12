@@ -55,7 +55,8 @@ class TagViewSet(mixins.DestroyModelMixin,
         return self.queryset.filter(user=self.request.user).order_by('-name')
 
 
-class DatastructureViewSet(mixins.ListModelMixin,
+class DatastructureViewSet(mixins.DestroyModelMixin,
+                           mixins.ListModelMixin,
                            mixins.UpdateModelMixin,
                            viewsets.GenericViewSet):
     """Manage Datastructures in the database"""
