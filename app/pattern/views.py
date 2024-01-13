@@ -40,31 +40,27 @@ class PatternViewSet(viewsets.ModelViewSet):
         serializer.save(user=self.request.user)
 
 
-class TagViewSet(mixins.DestroyModelMixin,
-                 mixins.UpdateModelMixin,
-                 mixins.ListModelMixin,
-                 viewsets.GenericViewSet):
-    """Manage Tags within database"""
-    serializer_class = serializers.TagSerializer
-    queryset = Tag.objects.all()
+class BasePatternAttrViewSet(mixins.DestroyModelMixin,
+                             mixins.UpdateModelMixin,
+                             mixins.ListModelMixin,
+                             viewsets.GenericViewSet):
+    """Generic Viewsets for Pattern Attributes"""
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         """Override get_queryset method to filter down to created user"""
-        return self.queryset.filter(user=self.request.user).order_by('-name')
+        return self.queryset.filter(
+            user=self.request.user).order_by('-name')
 
 
-class DatastructureViewSet(mixins.DestroyModelMixin,
-                           mixins.ListModelMixin,
-                           mixins.UpdateModelMixin,
-                           viewsets.GenericViewSet):
+class TagViewSet(BasePatternAttrViewSet):
+    """Manage Tags within database"""
+    serializer_class = serializers.TagSerializer
+    queryset = Tag.objects.all()
+
+
+class DatastructureViewSet(BasePatternAttrViewSet):
     """Manage Datastructures in the database"""
     serializer_class = serializers.DatastructureSerializer
     queryset = Datastructure.objects.all()
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
-
-    def get_queryset(self):
-        """Filter queryset to authenticated user"""
-        return self.queryset.filter(user=self.request.user).order_by('-name')
