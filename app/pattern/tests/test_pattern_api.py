@@ -305,6 +305,47 @@ class PrivatePatternApiTests(TestCase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(pattern.datastructures.count(), 0)
 
+    def test_filter_by_tags(self):
+        """Test - Filter Patterns by Associated Tags"""
+        r1 = create_pattern(user=self.user, title='Two Pointer')
+        r2 = create_pattern(user=self.user, title='Topological sort')
+        tag1 = Tag.objects.create(user=self.user, name='Array')
+        tag2 = Tag.objects.create(user=self.user, name='HashMap')
+        r1.tags.add(tag1)
+        r2.tags.add(tag2)
+        r3 = create_pattern(user=self.user, title='Merge Intervals')
+
+        params = {'tags': f'{tag1.id},{tag2.id}'}
+        res = self.client.get(PATTERN_URL, params)
+
+        s1 = PatternSerializer(r1)
+        s2 = PatternSerializer(r2)
+        s3 = PatternSerializer(r3)
+        self.assertIn(s1.data, res.data)
+        self.assertIn(s2.data, res.data)
+        self.assertNotIn(s3.data, res.data)
+
+    def test_filter_by_datastructures(self):
+        """Test - Filter Patterns by Data Structures"""
+        r1 = create_pattern(user=self.user, title='Sliding Window')
+        r2 = create_pattern(user=self.user,
+                            title='In-place Linked List Reversal')
+        in1 = Datastructure.objects.create(user=self.user, name='Array')
+        in2 = Datastructure.objects.create(user=self.user, name='LinkedList')
+        r1.datastructures.add(in1)
+        r2.datastructures.add(in2)
+        r3 = create_pattern(user=self.user, title='Tree DFS')
+
+        params = {'datastructures': f'{in1.id},{in2.id}'}
+        res = self.client.get(PATTERN_URL, params)
+
+        s1 = PatternSerializer(r1)
+        s2 = PatternSerializer(r2)
+        s3 = PatternSerializer(r3)
+        self.assertIn(s1.data, res.data)
+        self.assertIn(s2.data, res.data)
+        self.assertNotIn(s3.data, res.data)
+
 
 class ImageUploadTests(TestCase):
     """Tests for the Image Upload API"""
