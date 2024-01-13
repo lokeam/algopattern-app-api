@@ -1,6 +1,9 @@
 """
 DB models
 """
+import uuid
+import os
+
 from django.conf import settings
 from django.db import models
 from django.contrib.auth.models import (
@@ -8,6 +11,14 @@ from django.contrib.auth.models import (
     BaseUserManager,
     PermissionsMixin
 )
+
+
+def pattern_image_file_path(instance, filename):
+    """Generate file path for new Pattern image."""
+    ext = os.path.splitext(filename)[1]
+    filename = f'{uuid.uuid4()}{ext}'
+
+    return os.path.join('uploads', 'pattern', filename)
 
 
 class UserManager(BaseUserManager):
@@ -51,6 +62,7 @@ class Pattern(models.Model):
     link = models.CharField(max_length=255, blank=True)
     tags = models.ManyToManyField('Tag')
     datastructures = models.ManyToManyField('Datastructure')
+    image = models.ImageField(null=True, upload_to=pattern_image_file_path)
 
     def __str__(self):
         return self.title

@@ -1,6 +1,7 @@
 """
 Tests for Models
 """
+from unittest.mock import patch
 from django.test import TestCase
 from django.contrib.auth import get_user_model
 from core import models
@@ -82,3 +83,12 @@ class ModelTests(TestCase):
         )
 
         self.assertEqual(str(datastructure), datastructure.name)
+
+    @patch('uuid.uuid4')
+    def test_pattern_file_name_uuid(self, mock_uuid):
+        """Test - Create image path"""
+        uuid = 'test-uuid'
+        mock_uuid.return_value = uuid
+        file_path = models.pattern_image_file_path(None, 'example.jpg')
+
+        self.assertEqual(file_path, f'uploads/pattern/{uuid}.jpg')
