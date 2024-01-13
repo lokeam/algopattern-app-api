@@ -8,7 +8,10 @@ from django.test import TestCase
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from core.models import Tag
+from core.models import (
+    Tag,
+    Pattern,
+)
 
 from pattern.serializers import TagSerializer
 
@@ -93,3 +96,39 @@ class PrivatePatternApiTests(TestCase):
         self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
         tags = Tag.objects.filter(user=self.user)
         self.assertFalse(tags.exists())
+
+    def test_filter_tags_assigned_to_recipes(self):
+        """Test - Display Tags assigned to Patterns"""
+        tag1 = Tag.objects.create(user=self.user, name='PriorityQueue')
+        tag2 = Tag.objects.create(user=self.user, name='Scheduling')
+        pattern = Pattern.objects.create(
+            title='TwoHeaps',
+            user=self.user,
+        )
+        pattern.tags.add(tag1)
+
+        res = self.client.get(TAGS_URL, {'assigned_only': 1})
+
+        s1 = TagSerializer(tag1)
+        s2 = TagSerializer(tag2)
+        self.assertIn(s1.data, res.data)
+        self.assertNotIn(s2.data, res.data)
+
+    def test_filtered_tags_unique(self):
+        """Test - Filtered Tags returns list unique to Tags"""
+        tag = Tag.objects.create(user=self.user, name='Array')
+        Tag.objects.create(user=self.user, name='LinkedList')
+        pattern1 = Pattern.objects.create(
+            title='TwoPointers',
+            user=self.user,
+        )
+        pattern2 = Pattern.objects.create(
+            title='FastandSlow',
+            user=self.user,
+        )
+        pattern1.tags.add(tag)
+        pattern2.tags.add(tag)
+
+        res = self.client.get(TAGS_URL, {'assigned_only': 1})
+
+        self.assertEqual(len(res.data), 1)

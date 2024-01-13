@@ -8,7 +8,10 @@ from django.test import TestCase
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from core.models import Datastructure
+from core.models import (
+    Datastructure,
+    Pattern,
+)
 
 from pattern.serializers import DatastructureSerializer
 
@@ -98,3 +101,39 @@ class PrivateIngredientsApiTests(TestCase):
         self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
         datastructures = Datastructure.objects.filter(user=self.user)
         self.assertFalse(datastructures.exists())
+
+    def test_filter_datastructures_assigned_to_patterns(self):
+        """Test - List Datastructures assigned to Patterns"""
+        ds1 = Datastructure.objects.create(user=self.user, name='Array')
+        ds2 = Datastructure.objects.create(user=self.user, name='HashMap')
+        pattern = Pattern.objects.create(
+            title='FastandSlow',
+            user=self.user,
+        )
+        pattern.datastructures.add(ds1)
+
+        res = self.client.get(DS_URL, {'assigned_only': 1})
+
+        s1 = DatastructureSerializer(ds1)
+        s2 = DatastructureSerializer(ds2)
+        self.assertIn(s1.data, res.data)
+        self.assertNotIn(s2.data, res.data)
+
+    def test_filtered_ingredients_unique(self):
+        """Test - Filtered datastructures returns list unique to DS"""
+        ing = Datastructure.objects.create(user=self.user, name='Array')
+        Datastructure.objects.create(user=self.user, name='LinkedList')
+        pattern1 = Pattern.objects.create(
+            title='Sliding Window',
+            user=self.user,
+        )
+        pattern2 = Pattern.objects.create(
+            title='Two Pointers',
+            user=self.user,
+        )
+        pattern1.datastructures.add(ing)
+        pattern2.datastructures.add(ing)
+
+        res = self.client.get(DS_URL, {'assigned_only': 1})
+
+        self.assertEqual(len(res.data), 1)
