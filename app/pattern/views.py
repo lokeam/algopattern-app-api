@@ -3,8 +3,11 @@ Views for the Pattern APIs
 """
 from rest_framework import (
     viewsets,
-    mixins
+    mixins,
+    status
 )
+from rest_framework.decorators import action
+from rest_framework.response import Response
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 
@@ -31,6 +34,8 @@ class PatternViewSet(viewsets.ModelViewSet):
         """Return the serializer class for request."""
         if self.action == 'retrieve':
             return serializers.PatternDetailSerializer
+        elif self.action == 'upload_image':
+            return serializers.PatternImageSerializer
 
         return self.serializer_class
 
@@ -38,6 +43,18 @@ class PatternViewSet(viewsets.ModelViewSet):
         """When we perform a creation of a new obj via this viewset,
         create a new algo pattern"""
         serializer.save(user=self.request.user)
+
+    @action(methods=['POST'], detail=True, url_path='upload-image')
+    def upload_image(self, request, pk=None):
+        """Upload an image to pattern."""
+        recipe = self.get_object()
+        serializer = self.get_serializer(recipe, data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class BasePatternAttrViewSet(mixins.DestroyModelMixin,

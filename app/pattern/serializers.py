@@ -87,6 +87,16 @@ class PatternSerializer(serializers.ModelSerializer):
         return instance
 
 
+class PatternImageSerializer(serializers.ModelSerializer):
+    """Serializer for uploading images to Patterns"""
+
+    class Meta:
+        model = Pattern
+        fields = ['id', 'image']
+        read_only_fields = ['id']
+        extra_kwargs = {'image': {'required': 'True'}}
+
+
 class PatternDetailSerializer(PatternSerializer):
     """Serializer for the pattern detail view"""
 
